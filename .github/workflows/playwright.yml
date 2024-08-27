@@ -8,6 +8,13 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test-scenario:
+          - with-feature-A
+          - with-feature-B
+          - with-feature-A-and-B
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -17,27 +24,18 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
-    - name: Run Playwright tests for just scenario with feature A regex
-      run: npx playwright test --grep ^with-feature-A$
+    - name: Run Playwright tests with regex anchors
+      run: npx playwright test --grep ^${{ matrix.test-scenario }}$
       continue-on-error: true
-    - name: Run Playwright tests for just scenario with feature B regex
-      run: npx playwright test --grep ^with-feature-B$
+    - name: Run Playwright tests with regex ending anchors
+      run: npx playwright test --grep ${{ matrix.test-scenario }}$
       continue-on-error: true
-    - name: Run Playwright tests for just scenario with feature A and B regex
-      run: npx playwright test --grep ^with-feature-A-and-B$
-      continue-on-error: true
-    - name: Run Playwright tests for just scenario with feature A
-      run: npx playwright test --grep with-feature-A
-      continue-on-error: true
-    - name: Run Playwright tests for just scenario with feature B
-      run: npx playwright test --grep with-feature-B
-      continue-on-error: true
-    - name: Run Playwright tests for just scenario with feature A and B
-      run: npx playwright test --grep with-feature-A-and-B
+    - name: Run Playwright tests
+      run: npx playwright test --grep ${{ matrix.test-scenario }}
       continue-on-error: true
     - uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: playwright-report
+        name: ${{ matrix.test-scenario}}-playwright-report
         path: playwright-report/
         retention-days: 30
