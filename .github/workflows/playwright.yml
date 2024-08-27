@@ -17,6 +17,8 @@ jobs:
           - with-feature-A-and-B
     steps:
     - uses: actions/checkout@v4
+    - name: Deploy application
+      run: echo "Deploying application with configuration for ${{ matrix.test-scenario}}"
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
